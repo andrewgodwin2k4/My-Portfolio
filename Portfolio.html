@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrew Godwin J | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #111111;
+            --text-color: #ffffff;
+            --text-muted: #888888;
+            --accent-color: #ff4d00;
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --code-bg: #1e1e1e;
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 60px; position: fixed; top: 0; width: 100%;
+            z-index: 1000; backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            position: relative; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.3rem; text-transform: uppercase;
+            letter-spacing: 1px; padding: 5px 12px; color: var(--text-color);
+            display: inline-block; white-space: nowrap;
+        }
+
+        .logo-border {
+            position: absolute; top: 0; left: 0; height: 100%; width: 48%; 
+            border: 2px solid var(--accent-color); box-sizing: border-box;
+            animation: expandBorder 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 1.2s; z-index: -1;
+        }
+
+        @keyframes expandBorder { 0% { width: 48%; } 100% { width: 100%; } }
+
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links a {
+            text-decoration: none; color: var(--text-muted); font-size: 0.9rem;
+            font-weight: 500; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-color); }
+
+        header {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 20px;
+        }
+
+        .greeting-container {
+            height: 100px; overflow: hidden; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .greeting {
+            font-family: 'Space Grotesk', sans-serif; font-size: 5rem;
+            font-weight: 700; color: var(--accent-color); letter-spacing: -2px;
+            transform: translateY(100%); opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+        }
+        .greeting.visible { transform: translateY(0); opacity: 1; }
+        .greeting.exit { transform: translateY(-100%); opacity: 0; }
+
+        .code-window {
+            background: var(--code-bg); border-radius: 12px; width: 100%; max-width: 650px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;
+            overflow: hidden; text-align: left; transition: transform 0.3s ease;
+        }
+        .code-window:hover { transform: translateY(-5px); }
+
+        .window-header {
+            background: #252525; padding: 12px 15px; display: flex; gap: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+
+        .code-content {
+            padding: 25px; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem; line-height: 1.6; color: #a9b7c6;
+            white-space: pre-wrap; 
+            word-break: break-word;
+            position: relative;
+        }
+        
+        .key { color: #9876aa; } 
+        .string { color: #6a8759; } 
+        .colon { color: #cc7832; } 
+        .brace { color: #a9b7c6; }
+        .number { color: #6897bb; }
+
+        #cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background-color: var(--accent-color);
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .quote-container {
+            padding: 120px 20px; max-width: 1300px; margin: 0 auto;
+            text-align: center; overflow: hidden;
+        }
+        .quote-line {
+            display: block; font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 3.5rem); font-weight: 700;
+            line-height: 1.3; margin-bottom: 10px; opacity: 0;
+            transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease;
+        }
+        .quote-line.left { transform: translateX(-100px); }
+        .quote-line.right { transform: translateX(100px); color: var(--accent-color); }
+        .quote-line.active { opacity: 1; transform: translateX(0); }
+        
+        .quote-author {
+            margin-top: 40px; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem; opacity: 0; transform: translateY(20px);
+            transition: all 1s ease 0.5s;
+        }
+        .quote-author.active { opacity: 1; transform: translateY(0); }
+
+        .skills-section {
+            padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1); background: #0a0a0a;
+            overflow: hidden; position: relative;
+        }
+        .marquee { display: flex; width: max-content; animation: scroll 40s linear infinite; }
+        .skills-section:hover .marquee { animation-play-state: paused; }
+        
+        .skill-item {
+            display: flex; align-items: center; gap: 10px; margin: 0 40px;
+            font-weight: 600; font-size: 1.1rem; color: var(--text-muted);
+            transition: color 0.3s, transform 0.3s; white-space: nowrap; cursor: default;
+        }
+        .skill-item:hover { color: var(--text-color); transform: scale(1.1); }
+        .skill-item i { font-size: 1.8rem; }
+        
+        .fa-java { color: #f89820; } .fa-leaf { color: #6db33f; } .fa-database { color: #00758f; }
+        .fa-shield-halved { color: #6db33f; } .fa-network-wired { color: #00758f; } .fa-html5 { color: #e34f26; }
+        .fa-css3-alt { color: #1572b6; } .fa-js { color: #f7df1e; } .fa-react { color: #61dafb; }
+        .fa-wind { color: #38b2ac; } .fa-c { color: #00599c; } .fa-python { color: #3776ab; }
+        .fa-github { color: #ffffff; } .fa-feather { color: #c71a36; } .fa-rocket { color: #ef5b25; }
+        .fa-code { color: #85ea2d; }
+
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .section { padding: 100px 10%; max-width: 1300px; margin: 0 auto; }
+        .section-title {
+            font-size: 2.5rem; font-weight: 800; margin-bottom: 60px;
+            display: flex; align-items: center; gap: 20px; font-family: 'Space Grotesk', sans-serif;
+        }
+        .section-title span { color: var(--accent-color); font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+
+        .timeline {
+            position: relative; padding-left: 20px; border-left: 2px solid rgba(255,255,255,0.1);
+        }
+        .experience-item { margin-bottom: 60px; position: relative; padding-left: 40px; }
+        .experience-item::before {
+            content: ''; position: absolute; left: -29px; top: 0;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--bg-color); border: 2px solid var(--accent-color);
+            transition: all 0.3s ease; box-shadow: 0 0 10px var(--accent-color);
+        }
+        .experience-item:hover::before { background: var(--accent-color); box-shadow: 0 0 20px var(--accent-color); }
+
+        .exp-card {
+            background: var(--card-bg); backdrop-filter: blur(10px); padding: 30px;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .exp-card:hover { transform: translateY(-5px); border-color: rgba(255, 77, 0, 0.5); }
+        .exp-role { font-size: 1.5rem; font-weight: 700; color: var(--text-color); font-family: 'Space Grotesk', sans-serif; }
+        .exp-company { font-family: 'JetBrains Mono', monospace; color: var(--accent-color); font-size: 0.9rem; margin: 8px 0 15px 0; display: block; }
+        
+        .exp-list {
+            list-style: none;
+            padding-left: 5px;
+        }
+        .exp-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .exp-list li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        .projects-grid { 
+            display: flex; flex-direction: column; gap: 30px; 
+            max-width: 1100px; margin: 0 auto;
+        }
+        
+        .project-card {
+            background: rgba(20, 20, 20, 0.6); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; 
+            padding: 30px; 
+            position: relative; 
+            overflow: hidden;
+            transition: all 0.4s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 35px;
+            text-decoration: none; 
+            color: inherit; 
+        }
+        .project-card:hover {
+            transform: translateX(10px); 
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 40px -10px rgba(255, 77, 0, 0.15);
+        }
+        
+        .project-image {
+            width: 350px; height: 220px; object-fit: cover; border-radius: 8px;
+            opacity: 0.9; transition: opacity 0.3s ease, transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0;
+        }
+        .project-card:hover .project-image { opacity: 1; transform: scale(1.02); }
+
+        .project-content { flex: 1; }
+        .project-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--text-color); font-family: 'Space Grotesk', sans-serif; }
+        .project-desc { font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+        
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent-color);
+            background: rgba(255, 77, 0, 0.1); padding: 5px 12px; border-radius: 50px;
+            border: 1px solid rgba(255, 77, 0, 0.2); transition: all 0.3s;
+        }
+        .project-card:hover .tech-pill { background: rgba(255, 77, 0, 0.2); border-color: var(--accent-color); }
+
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 25px; max-width: 900px; margin: 0 auto;
+        }
+
+        .cert-card {
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none; /* Remove underline */
+            color: inherit;
+        }
+        .cert-card:hover {
+            border-color: var(--accent-color); transform: translateX(5px);
+            background: rgba(255,255,255,0.05);
+        }
+        .cert-icon-box {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255, 77, 0, 0.1); display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .cert-icon-box i { font-size: 1.2rem; color: var(--accent-color); }
+        .cert-info h4 { font-size: 1.1rem; margin-bottom: 4px; color: var(--text-color); font-family: 'Space Grotesk', sans-serif; }
+        .cert-info p { font-size: 0.9rem; color: var(--text-muted); margin: 0; font-family: 'JetBrains Mono', monospace; }
+
+        footer {
+            background: #050505;
+            padding: 80px 10% 40px;
+            position: relative;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        footer::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 1px; background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        }
+
+        .footer-content {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 40px; margin-bottom: 60px;
+        }
+
+        .footer-cta h2 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700;
+            line-height: 1.1; margin-bottom: 20px;
+        }
+        .footer-cta h2 span { color: var(--accent-color); }
+        .footer-cta p { color: var(--text-muted); max-width: 400px; font-size: 1.1rem; }
+
+        .footer-links {
+            display: flex; gap: 60px;
+        }
+        .footer-col h4 {
+            color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .social-btn {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.05); padding: 12px 25px; border-radius: 8px;
+            text-decoration: none; color: white; transition: 0.3s;
+            border: 1px solid transparent; margin-bottom: 15px; width: 100%;
+        }
+        .social-btn:hover {
+            background: rgba(255, 77, 0, 0.1); border-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+        .social-btn i { font-size: 1.2rem; width: 20px; text-align: center; }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;
+            display: flex; justify-content: center;
+            align-items: center;
+            color: #555; font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            nav { justify-content: center; padding: 20px; }
+            .nav-links { display: none; }
+            .logo-border { width: 100% !important; animation: none; }
+
+            .section { padding: 60px 20px; }
+            .greeting { font-size: 3.5rem; }
+
+            .section-title {
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .section-title::after { display: none; } 
+
+            .timeline { border-left: none; padding-left: 0; }
+            .experience-item { padding-left: 0; }
+            .experience-item::before { display: none; }
+
+            .project-card { 
+                flex-direction: column; 
+                gap: 20px; 
+                text-align: center; 
+            }
+            .project-image { 
+                width: 100%; 
+                height: auto; 
+                max-height: 250px; 
+            }
+            .tech-stack { justify-content: center; }
+
+            .footer-content { flex-direction: column; align-items: center; text-align: center; }
+            .footer-links { flex-direction: column; gap: 30px; width: 100%; align-items: center; }
+            .footer-cta p { margin: 0 auto; }
+            
+            .cert-grid { grid-template-columns: 1fr; } 
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-border"></div>
+            <span>ANDREW GODWIN J</span>
+        </div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
+            <a href="#certifications">Certifications</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <header id="about">
+        <div class="greeting-container">
+            <h1 class="greeting visible" id="greeting-text">Hello!</h1>
+        </div>
+
+        <div class="code-window">
+            <div class="window-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="code-content" id="code-container"></div>
+        </div>
+    </header>
+
+    <div class="quote-container" id="quote-section">
+        <span class="quote-line left">If I have the belief that I can do it,</span>
+        <span class="quote-line right">I shall surely acquire the capacity to do it</span>
+        <span class="quote-line left">even if I may not have it at the beginning.</span>
+        <div class="quote-author">- Mahatma Gandhi</div>
+    </div>
+
+    <div class="skills-section">
+        <div class="marquee">
+            <div class="skill-item"><i class="fab fa-java"></i> Java</div>
+            <div class="skill-item"><i class="fas fa-leaf"></i> SpringBoot</div>
+            <div class="skill-item"><i class="fas fa-database"></i> Spring Data JPA</div>
+            <div class="skill-item"><i class="fas fa-shield-halved"></i> Spring Security</div>
+            <div class="skill-item"><i class="fas fa-database"></i> MySQL</div>
+            <div class="skill-item"><i class="fas fa-network-wired"></i> REST APIs</div>
+            <div class="skill-item"><i class="fab fa-html5"></i> HTML</div>
+            <div class="skill-item"><i class="fab fa-css3-alt"></i> CSS</div>
+            <div class="skill-item"><i class="fab fa-js"></i> JavaScript</div>
+            <div class="skill-item"><i class="fab fa-react"></i> React</div>
+            <div class="skill-item"><i class="fas fa-wind"></i> Tailwind</div>
+            <div class="skill-item"><i class="fas fa-c"></i> C Programming</div>
+            <div class="skill-item"><i class="fab fa-python"></i> Python</div>
+            <div class="skill-item"><i class="fab fa-github"></i> GitHub</div>
+            <div class="skill-item"><i class="fas fa-feather"></i> Maven</div>
+            <div class="skill-item"><i class="fas fa-rocket"></i> Postman</div>
+            <div class="skill-item"><i class="fas fa-code"></i> Swagger</div>
+            <div class="skill-item"><i class="fab fa-java"></i> Java</div>
+            <div class="skill-item"><i class="fas fa-leaf"></i> SpringBoot</div>
+            <div class="skill-item"><i class="fas fa-database"></i> Spring Data JPA</div>
+            <div class="skill-item"><i class="fas fa-shield-halved"></i> Spring Security</div>
+            <div class="skill-item"><i class="fas fa-database"></i> MySQL</div>
+            <div class="skill-item"><i class="fas fa-network-wired"></i> REST APIs</div>
+            <div class="skill-item"><i class="fab fa-html5"></i> HTML</div>
+            <div class="skill-item"><i class="fab fa-css3-alt"></i> CSS</div>
+            <div class="skill-item"><i class="fab fa-js"></i> JavaScript</div>
+            <div class="skill-item"><i class="fab fa-react"></i> React</div>
+            <div class="skill-item"><i class="fas fa-wind"></i> Tailwind</div>
+            <div class="skill-item"><i class="fas fa-c"></i> C Programming</div>
+            <div class="skill-item"><i class="fab fa-python"></i> Python</div>
+            <div class="skill-item"><i class="fab fa-github"></i> GitHub</div>
+            <div class="skill-item"><i class="fas fa-feather"></i> Maven</div>
+            <div class="skill-item"><i class="fas fa-rocket"></i> Postman</div>
+            <div class="skill-item"><i class="fas fa-code"></i> Swagger</div>
+        </div>
+    </div>
+
+    <section id="experience" class="section">
+        <h2 class="section-title">EXPERIENCE</h2>
+        <div class="timeline">
+            <div class="experience-item">
+                <div class="exp-card">
+                    <h3 class="exp-role">Full Stack Developer Intern</h3>
+                    <span class="exp-company">@ 8Queens Software Company, Chennai | July - Aug 2025</span>
+                    <ul class="exp-list">
+                        <li>Developed RESTful services with Spring Boot and connected them with responsive frontend interfaces.</li>
+                        <li>Managed the entire development workflow independently using GitHub.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="experience-item">
+                <div class="exp-card">
+                    <h3 class="exp-role">B.E - Computer Science (Hons)</h3>
+                    <span class="exp-company">@ GCE, Thanjavur | 2022 - 2026</span>
+                    <ul class="exp-list">
+                        <li>Learned that I love this field and patted myself for choosing it.</li>
+                        <li>Refined Data Structures and Algorithms & solved a lot of Leetcode problems.</li>
+                        <li>Experimented with various tech and built some cool projects.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="section">
+        <h2 class="section-title">FEATURED PROJECTS</h2>
+        <div class="projects-grid">
+            <a href="https://github.com/andrewgodwin2k4/Service-Barter-Platform" target="_blank" class="project-card">
+                <img src="service.png" alt="XERV Project" class="project-image">
+                
+                <div class="project-content">
+                    <h3 class="project-title">XERV - Barter Platform</h3>
+                    <p class="project-desc">
+                        A unique platform enabling users to exchange services using credits instead of money. Implemented JWT authentication, progress tracking, and dispute resolution for a secure community.
+                    </p>
+                    <div class="tech-stack">
+                        <span class="tech-pill">SpringBoot</span>
+                        <span class="tech-pill">React</span>
+			<span class="tech-pill">Tailwind</span>
+                        <span class="tech-pill">MySQL</span>
+                        <span class="tech-pill">Spring Security</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="https://github.com/andrewgodwin2k4/MiniDB" target="_blank" class="project-card">
+                <img src="data.png" alt="MiniDB Project" class="project-image">
+
+                <div class="project-content">
+                    <h3 class="project-title">MiniDB - Database Engine</h3>
+                    <p class="project-desc">
+                        Built a lightweight relational database engine with file-based storage. Designed an interactive color-coded REPL terminal with a custom command parser for managing table metadata.
+                    </p>
+                    <div class="tech-stack">
+                        <span class="tech-pill">Java</span>
+                        <span class="tech-pill">File I/O</span>
+                        <span class="tech-pill">Data Structures</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section id="certifications" class="section">
+        <h2 class="section-title">CERTIFICATIONS</h2>
+        <div class="cert-grid">
+            <a href="https://github.com/andrewgodwin2k4/Certificates/blob/main/Java_Programming_GeeksForGeeks.pdf" target="_blank" class="cert-card">
+                <div class="cert-icon-box"><i class="fas fa-certificate"></i></div>
+                <div class="cert-info">
+                    <h4>Java Programming</h4>
+                    <p>GeeksforGeeks</p>
+                </div>
+            </a>
+            <a href="https://github.com/andrewgodwin2k4/Certificates/blob/main/Data_Structures_and_Algorithms_using_Java_NPTEL.pdf" target="_blank" class="cert-card">
+                <div class="cert-icon-box"><i class="fas fa-code-branch"></i></div>
+                <div class="cert-info">
+                    <h4>DSA using Java</h4>
+                    <p>NPTEL</p>
+                </div>
+            </a>
+            <a href="https://github.com/andrewgodwin2k4/Certificates/blob/main/Introduction_to_SQL_Simplilearn.pdf" target="_blank" class="cert-card">
+                <div class="cert-icon-box"><i class="fas fa-database"></i></div>
+                <div class="cert-info">
+                    <h4>Introduction to SQL</h4>
+                    <p>Simplilearn</p>
+                </div>
+            </a>
+            <a href="https://github.com/andrewgodwin2k4/Certificates/blob/main/Spring_Boot_Essentials_Scaler.pdf" target="_blank" class="cert-card">
+                <div class="cert-icon-box"><i class="fas fa-leaf"></i></div>
+                <div class="cert-info">
+                    <h4>Spring Boot Essentials</h4>
+                    <p>Scaler</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-cta">
+                <h2>Let's create something <br><span>extraordinary.</span></h2>
+                <p>Always open to discussing new projects, creative ideas or opportunities to be part of your visions.</p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-col" style="min-width: 200px;">
+                    <h4>Connect</h4>
+                    <a href="resume.pdf" target="_blank" class="social-btn" style="border-color: var(--accent-color); color: var(--accent-color);">
+                        <i class="fas fa-file-download"></i> Resume
+                    </a>
+                    <a href="mailto:andrewgodwin2004@gmail.com" target="_blank" class="social-btn">
+                        <i class="fas fa-envelope"></i> Email 
+                    </a>
+                    <a href="https://www.linkedin.com/in/andrew-godwin-89576b2a3" target="_blank" class="social-btn">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                    <a href="https://github.com/andrewgodwin2k4" target="_blank" class="social-btn">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Andrew Godwin J. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const greetings = ["Hello!", "வணக்கம்!", "नमस्ते!",  "Hola!","Bonjour!","Guten Tag!","こんにちは!","안녕하세요!","Ciao!"];
+        const greetingElement = document.getElementById('greeting-text');
+        let index = 0;
+
+        function updateGreeting() {
+            greetingElement.classList.remove('visible');
+            greetingElement.classList.add('exit');
+
+            setTimeout(() => {
+                index = (index + 1) % greetings.length;
+                greetingElement.innerText = greetings[index];
+                
+                greetingElement.classList.remove('exit');
+                greetingElement.style.transition = 'none';
+                greetingElement.style.transform = 'translateY(100%)';
+                greetingElement.style.opacity = '0';
+                void greetingElement.offsetWidth; 
+                
+                greetingElement.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease';
+                greetingElement.style.transform = '';
+                greetingElement.style.opacity = '';
+                greetingElement.classList.add('visible');
+            }, 500);
+        }
+        setInterval(updateGreeting, 2500);
+
+        const codeContainer = document.getElementById('code-container');
+        const cursor = document.createElement('span');
+        cursor.id = 'cursor';
+        
+        const codeTokens = [
+            { text: "{\n", class: "brace" },
+            { text: "  ", class: "" }, 
+            { text: "\"about_me\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "{\n", class: "brace" },
+            
+            { text: "    ", class: "" }, 
+            { text: "\"name\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "\"Andrew Godwin J\"", class: "string" },
+            { text: ",\n", class: "brace" },
+
+            { text: "    ", class: "" },
+            { text: "\"career_in_progress\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "\"Software Development\"", class: "string" },
+            { text: ",\n", class: "brace" },
+
+            { text: "    ", class: "" },
+            { text: "\"strengths\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "[", class: "brace" },
+            { text: "\"Java\"", class: "string" },
+            { text: ", ", class: "brace" },
+            { text: "\"Sarcasm\"", class: "string" },
+            { text: ", ", class: "brace" },
+            { text: "\"Perseverance\"", class: "string" },
+            { text: "]", class: "brace" },
+            { text: ",\n", class: "brace" },
+
+            { text: "    ", class: "" },
+            { text: "\"goal\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "\"Impress my future self\"", class: "string" },
+            { text: ",\n", class: "brace" },
+
+            { text: "    ", class: "" },
+            { text: "\"secret_msg\"", class: "key" },
+            { text: ": ", class: "colon" },
+            { text: "\"110010100\"\n", class: "string" },
+
+            { text: "  ", class: "" },
+            { text: "}\n", class: "brace" },
+            { text: "}", class: "brace" }
+        ];
+
+        async function typeWholeBlock() {
+            codeContainer.appendChild(cursor);
+            
+            await new Promise(resolve => setTimeout(resolve, 800)); 
+
+            for (let token of codeTokens) {
+                let span = document.createElement('span');
+                if (token.class) span.className = token.class;
+                codeContainer.insertBefore(span, cursor);
+
+                for (let char of token.text) {
+                    span.textContent += char;
+                    codeContainer.scrollTop = codeContainer.scrollHeight;
+                    
+                    let delay = (char === ' ' || char === '\n') ? 5 : 25; 
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                
+                if (token.text.includes('\n')) {
+                    await new Promise(resolve => setTimeout(resolve, 250));
+                }
+            }
+
+            cursor.remove();
+        }
+
+        typeWholeBlock();
+
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.5 };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const lines = entry.target.querySelectorAll('.quote-line');
+                    const author = entry.target.querySelector('.quote-author');
+                    lines.forEach((line, index) => {
+                        setTimeout(() => { line.classList.add('active'); }, index * 150);
+                    });
+                    author.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const quoteSection = document.getElementById('quote-section');
+        if(quoteSection) observer.observe(quoteSection);
+    </script>
+</body>
+</html>
